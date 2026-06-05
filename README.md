@@ -1,108 +1,158 @@
 # SpendWise Expense Tracker
 
-A Flutter expense tracker with a Node.js/Express REST API backend and MySQL database.
+## Description
 
-Flutter does not connect directly to MySQL. Run the backend API, then Flutter calls that API over HTTP.
+SpendWise is a full-stack expense tracking application built with a Flutter frontend, Node.js and Express.js backend, MySQL database, JWT authentication, and REST API integration.
 
-## Prerequisites
+The application allows users to register and log in, manage income and expense transactions, track budgets, view dashboard summaries and analytics, and store all financial data securely in a MySQL relational database. Flutter communicates with the backend through protected REST API endpoints. The frontend does not connect directly to MySQL.
 
-- Flutter SDK `>=3.0.0`
-- Dart `>=3.0.0`
-- Node.js `>=18`
-- MySQL Server `>=8`
+## Features
+
+- User registration and login
+- JWT authentication
+- Protected API routes
+- Add and view income transactions
+- Add and view expense transactions
+- Budget tracking
+- Dashboard summary
+- Analytics screen
+- MySQL database integration
+- Postman API testing collection
+- Clean folder structure with frontend services and backend controllers, routes, and middleware
+
+## Technologies Used
+
+### Frontend
+
+- Flutter
+- Dart
+- HTTP package
+- fl_chart
+- Google Fonts
+
+### Backend
+
+- Node.js
+- Express.js
+- MySQL
+- mysql2
+- JWT / jsonwebtoken
+- bcryptjs
+- dotenv
+- cors
+- nodemon
+
+### Tools
+
+- MySQL Workbench
 - Postman
-- Android Studio or VS Code with Flutter support
+- Git
+- GitHub
+- VS Code
 
-## Create The MySQL Database
+## Project Structure
 
-From a MySQL shell or MySQL Workbench, run:
+```text
+expense_tracker/
+├── lib/
+│   ├── screens/
+│   ├── models/
+│   ├── services/
+│   ├── widgets/
+│   ├── themes/
+│   └── utils/
+│
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   └── routes/
+│   ├── database/
+│   └── postman/
+│
+├── assets/
+├── test/
+├── pubspec.yaml
+└── README.md
+```
+
+## Setup Instructions
+
+### Frontend Setup
+
+```bash
+cd D:\expense_tracker
+flutter pub get
+flutter run -d chrome
+```
+
+### Backend Setup
+
+```bash
+cd D:\expense_tracker\backend
+npm install
+copy .env.example .env
+npm run dev
+```
+
+After copying `.env.example`, update `.env` with your local MySQL credentials and JWT secret.
+
+## Environment Variables
+
+Create a `.env` file inside the `backend/` folder using this format:
+
+```env
+PORT=5000
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=expense_tracker_db
+JWT_SECRET=replace_with_a_long_random_secret
+JWT_EXPIRES_IN=7d
+```
+
+> Warning: Do not upload the real `.env` file to GitHub. Keep database passwords and JWT secrets private.
+
+## MySQL Setup
+
+1. Open MySQL Workbench.
+2. Create the database:
 
 ```sql
-SOURCE D:/expense_tracker/backend/database/schema.sql;
-SOURCE D:/expense_tracker/backend/database/seed.sql;
+CREATE DATABASE expense_tracker_db;
 ```
 
-You can also paste and run the contents of these files manually:
-
-- `backend/database/schema.sql`
-- `backend/database/seed.sql`
-
-The database name is `expense_tracker_db`.
-
-Seeded demo account:
+3. Run the schema file:
 
 ```text
-email: demo@example.com
-password: password123
+backend/database/schema.sql
 ```
 
-## Run The Backend
-
-```bash
-cd D:/expense_tracker/backend
-copy .env.example .env
-npm install
-npm run dev
-```
-
-Edit `backend/.env` before starting if your MySQL username, password, host, or port are different.
-
-The API runs at:
+4. Optional: run the seed file:
 
 ```text
-http://localhost:5000/api
+backend/database/seed.sql
 ```
 
-Health check:
+5. Verify the database tables:
 
-```text
-GET http://localhost:5000/api/health
+```sql
+USE expense_tracker_db;
+SHOW TABLES;
 ```
-
-Backend scripts:
-
-```bash
-npm run dev
-npm start
-```
-
-## Test With Postman
-
-Import this collection:
-
-```text
-backend/postman/expense_tracker_collection.json
-```
-
-Run requests in this order:
-
-1. `Auth / Register` or `Auth / Login`
-2. `Auth / Login` saves the JWT into the Postman collection variable `token`.
-3. Run protected transaction and budget requests with `Authorization: Bearer {{token}}`.
 
 ## API Endpoints
 
-Auth:
+### Auth
 
 ```text
 POST /api/auth/register
 POST /api/auth/login
 ```
 
-Login/register response:
-
-```json
-{
-  "token": "...",
-  "user": {
-    "id": 1,
-    "name": "Demo User",
-    "email": "demo@example.com"
-  }
-}
-```
-
-Transactions require `Authorization: Bearer <token>`:
+### Transactions
 
 ```text
 GET /api/transactions
@@ -111,20 +161,7 @@ PUT /api/transactions/:id
 DELETE /api/transactions/:id
 ```
 
-Create/update transaction body:
-
-```json
-{
-  "title": "Coffee",
-  "amount": 4.75,
-  "type": "expense",
-  "category": "food",
-  "transactionDate": "2026-06-05",
-  "note": "Morning coffee"
-}
-```
-
-Budgets require `Authorization: Bearer <token>`:
+### Budgets
 
 ```text
 GET /api/budgets
@@ -133,78 +170,45 @@ PUT /api/budgets/:id
 DELETE /api/budgets/:id
 ```
 
-Create/update budget body:
-
-```json
-{
-  "category": "food",
-  "limitAmount": 650,
-  "month": "2026-06"
-}
-```
-
-## Run Flutter
-
-```bash
-cd D:/expense_tracker
-flutter pub get
-flutter run -d chrome
-```
-
-API base URL defaults:
-
-- Chrome/web: `http://localhost:5000/api`
-- Android emulator: `http://10.0.2.2:5000/api`
-- Real phone: pass your computer LAN API URL:
-
-```bash
-flutter run --dart-define=API_BASE_URL=http://192.168.x.x:5000/api
-```
-
-## Flutter API Services
-
-The app includes API service classes:
+Protected endpoints require this header:
 
 ```text
-lib/services/api_service.dart
-lib/services/auth_service.dart
-lib/services/transaction_service.dart
-lib/services/budget_service.dart
+Authorization: Bearer <token>
 ```
 
-Existing screens still render with the current UI while data migration happens screen-by-screen. New screens or state management can call these services instead of `DummyData`.
+## Postman Testing
 
-## Project Structure
+A Postman collection is included for API testing:
 
 ```text
-backend/
-  database/
-    schema.sql
-    seed.sql
-  postman/
-    expense_tracker_collection.json
-  src/
-    config/
-    controllers/
-    middleware/
-    routes/
-
-lib/
-  dummy_data/
-  models/
-  screens/
-  services/
-  themes/
-  utils/
-  widgets/
+backend/postman/expense_tracker_collection.json
 ```
 
-## Main Flutter Dependencies
+Import this collection into Postman, register or log in to receive a JWT token, and use the token to test protected transaction and budget endpoints.
 
-```yaml
-fl_chart: ^0.68.0
-google_fonts: ^6.2.1
-animations: ^2.0.11
-intl: ^0.19.0
-http: ^1.2.2
-```
+## Screenshots
+
+Add screenshots here:
+
+- Login Screen
+- Dashboard
+- Transactions
+- Analytics
+- MySQL/Postman Testing
+
+## Learning Outcomes
+
+This project demonstrates:
+
+- REST API integration
+- JWT authentication and authorization
+- Middleware and protected routes
+- MySQL relational database design
+- Flutter service layer architecture
+- Postman API testing
+- Full-stack project deployment workflow
+
+## Author
+
+**Name:** Jatan Puri  
+**GitHub:** [https://github.com/jatanpuri5-lab](https://github.com/jatanpuri5-lab)
