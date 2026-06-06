@@ -31,6 +31,18 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Expense tracker API running on http://localhost:${port}`);
+});
+
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(
+      `Port ${port} is already in use. Stop the existing backend process or change PORT in .env.`
+    );
+    process.exit(1);
+  }
+
+  console.error(err);
+  process.exit(1);
 });

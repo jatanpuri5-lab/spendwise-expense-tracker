@@ -5,6 +5,7 @@ import 'package:fl_chart/fl_chart.dart';
 import '../themes/app_theme.dart';
 import '../models/budget_model.dart';
 import '../models/transaction_model.dart';
+import '../services/api_service.dart';
 import '../services/app_services.dart';
 import '../utils/formatters.dart';
 
@@ -68,8 +69,9 @@ class _BudgetScreenState extends State<BudgetScreen>
     }
   }
 
-  Future<void> _createBudget() async {
-    final limit = double.tryParse(_limitController.text);
+  Future<void> _saveBudget({BudgetModel? budget}) async {
+    final limit =
+        double.tryParse(_limitController.text.replaceAll(',', '').trim());
     final month = _monthController.text.trim();
 
     if (limit == null ||
@@ -82,21 +84,72 @@ class _BudgetScreenState extends State<BudgetScreen>
     setState(() => _isSaving = true);
 
     try {
-      await AppServices.budgets.createBudget(
-        category: _newBudgetCategory,
-        limitAmount: limit,
-        month: month,
-      );
+      if (budget == null) {
+        await AppServices.budgets.createBudget(
+          category: _newBudgetCategory,
+          limitAmount: limit,
+          month: month,
+        );
+      } else {
+        await AppServices.budgets.updateBudget(
+          id: budget.id,
+          category: _newBudgetCategory,
+          limitAmount: limit,
+          month: month,
+        );
+      }
       _limitController.clear();
       if (!mounted) return;
       Navigator.pop(context);
-      _showMessage('Budget created', isError: false);
-      _loadBudgets();
+      _showMessage(budget == null ? 'Budget created' : 'Budget updated',
+          isError: false);
+      await _loadBudgets();
+    } on ApiException catch (err) {
+      if (!mounted) return;
+      _showMessage(err.message, isError: true);
     } catch (_) {
       if (!mounted) return;
-      _showMessage('Could not create budget', isError: true);
+      _showMessage(
+        budget == null ? 'Could not create budget' : 'Could not update budget',
+        isError: true,
+      );
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _deleteBudget(BudgetModel budget) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete budget?'),
+        content: Text('Remove the ${budget.category.label} budget?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+
+    try {
+      await AppServices.budgets.deleteBudget(budget.id);
+      await _loadBudgets();
+      if (!mounted) return;
+      _showMessage('Budget deleted', isError: false);
+    } on ApiException catch (err) {
+      if (!mounted) return;
+      _showMessage(err.message, isError: true);
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('Could not delete budget', isError: true);
     }
   }
 
@@ -136,7 +189,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                       style: Theme.of(context).textTheme.displayMedium,
                     ),
                     GestureDetector(
-                      onTap: _showCreateBudgetSheet,
+                      onTap: () => _showBudgetSheet(),
                       child: Container(
                         width: 42,
                         height: 42,
@@ -175,7 +228,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryDark.withOpacity(0.3),
+                        color: AppColors.primaryDark.withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -203,7 +256,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                                     title: '',
                                   ),
                                   PieChartSectionData(
-                                    color: Colors.white.withOpacity(0.1),
+                                    color: Colors.white.withValues(alpha: 0.1),
                                     value: (1 - overallPct).clamp(0.0, 1.0),
                                     radius: 18,
                                     title: '',
@@ -225,7 +278,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                                 Text(
                                   'Used',
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.6),
+                                    color: Colors.white.withValues(alpha: 0.6),
                                     fontSize: 11,
                                   ),
                                 ),
@@ -242,7 +295,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                             Text(
                               'Monthly Budget',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 13,
                               ),
                             ),
@@ -350,8 +403,15 @@ class _BudgetScreenState extends State<BudgetScreen>
     );
   }
 
-  void _showCreateBudgetSheet() {
+  void _showBudgetSheet({BudgetModel? budget}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (budget == null) {
+      _limitController.clear();
+    } else {
+      _newBudgetCategory = budget.category;
+      _limitController.text = budget.limit.toStringAsFixed(2);
+      _monthController.text = budget.month;
+    }
 
     showModalBottomSheet(
       context: context,
@@ -375,7 +435,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'New Budget',
+                    budget == null ? 'New Budget' : 'Edit Budget',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 18),
@@ -439,7 +499,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                   ),
                   const SizedBox(height: 20),
                   GestureDetector(
-                    onTap: _isSaving ? null : _createBudget,
+                    onTap: _isSaving ? null : () => _saveBudget(budget: budget),
                     child: Container(
                       height: 54,
                       decoration: BoxDecoration(
@@ -460,9 +520,11 @@ class _BudgetScreenState extends State<BudgetScreen>
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Create Budget',
-                                style: TextStyle(
+                            : Text(
+                                budget == null
+                                    ? 'Create Budget'
+                                    : 'Update Budget',
+                                style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w700,
                                   fontSize: 16,
@@ -486,7 +548,8 @@ class _BudgetScreenState extends State<BudgetScreen>
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 11),
+          style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.6), fontSize: 11),
         ),
         Text(
           value,
@@ -512,8 +575,9 @@ class _BudgetScreenState extends State<BudgetScreen>
         color: isDark ? AppColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color:
-              isOver ? AppColors.expense.withOpacity(0.3) : Colors.transparent,
+          color: isOver
+              ? AppColors.expense.withValues(alpha: 0.3)
+              : Colors.transparent,
           width: 1,
         ),
       ),
@@ -525,7 +589,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: budget.category.color.withOpacity(0.12),
+                  color: budget.category.color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(budget.category.icon,
@@ -548,7 +612,7 @@ class _BudgetScreenState extends State<BudgetScreen>
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: AppColors.expense.withOpacity(0.1),
+                              color: AppColors.expense.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: const Text(
@@ -569,7 +633,35 @@ class _BudgetScreenState extends State<BudgetScreen>
                             fontSize: 12,
                           ),
                     ),
+                    if (budget.month.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        budget.month,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontSize: 12,
+                            ),
+                      ),
+                    ],
                   ],
+                ),
+              ),
+              PopupMenuButton<String>(
+                onSelected: (value) {
+                  if (value == 'edit') {
+                    _showBudgetSheet(budget: budget);
+                  } else if (value == 'delete') {
+                    _deleteBudget(budget);
+                  }
+                },
+                itemBuilder: (_) => const [
+                  PopupMenuItem(value: 'edit', child: Text('Edit')),
+                  PopupMenuItem(value: 'delete', child: Text('Delete')),
+                ],
+                icon: Icon(
+                  Icons.more_vert_rounded,
+                  color: isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.lightTextSecondary,
                 ),
               ),
             ],
@@ -580,7 +672,7 @@ class _BudgetScreenState extends State<BudgetScreen>
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: budget.percentage,
-              backgroundColor: progressColor.withOpacity(0.1),
+              backgroundColor: progressColor.withValues(alpha: 0.1),
               valueColor: AlwaysStoppedAnimation<Color>(progressColor),
               minHeight: 8,
             ),

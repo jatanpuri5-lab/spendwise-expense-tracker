@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../themes/app_theme.dart';
 import '../models/transaction_model.dart';
+import '../services/api_service.dart';
 import '../services/app_services.dart';
 import '../utils/formatters.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  final TransactionModel? initialTransaction;
+
+  const AddExpenseScreen({super.key, this.initialTransaction});
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -60,6 +63,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
   @override
   void initState() {
     super.initState();
+    final initial = widget.initialTransaction;
+    if (initial != null) {
+      _amountController.text = initial.amount.toStringAsFixed(2);
+      _titleController.text = initial.title;
+      _notesController.text = initial.notes ?? '';
+      _selectedCategory = initial.category;
+      _transactionType = initial.type;
+      _selectedDate = initial.date;
+    }
+
     _animController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -124,7 +137,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
   }
 
   Future<void> _save() async {
-    final amount = double.tryParse(_amountController.text);
+    final amount =
+        double.tryParse(_amountController.text.replaceAll(',', '').trim());
     final title = _titleController.text.trim().isEmpty
         ? _selectedCategory.label
         : _titleController.text.trim();
@@ -145,21 +159,43 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
     setState(() => _isSaving = true);
 
     try {
-      await AppServices.transactions.createTransaction(
-        title: title,
-        amount: amount,
-        type: _transactionType,
-        category: _selectedCategory,
-        date: _selectedDate,
-        notes: _notesController.text.trim().isEmpty
-            ? null
-            : _notesController.text.trim(),
-      );
+      final note = _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim();
+      final initial = widget.initialTransaction;
+
+      if (initial == null) {
+        await AppServices.transactions.createTransaction(
+          title: title,
+          amount: amount,
+          type: _transactionType,
+          category: _selectedCategory,
+          date: _selectedDate,
+          notes: note,
+        );
+      } else {
+        await AppServices.transactions.updateTransaction(
+          TransactionModel(
+            id: initial.id,
+            userId: initial.userId,
+            title: title,
+            amount: amount,
+            type: _transactionType,
+            category: _selectedCategory,
+            date: _selectedDate,
+            notes: note,
+            paymentMethod: initial.paymentMethod,
+            createdAt: initial.createdAt,
+          ),
+        );
+      }
+      await AppServices.transactions.getTransactions();
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Transaction saved!'),
+          content: Text(
+              initial == null ? 'Transaction saved!' : 'Transaction updated!'),
           backgroundColor: AppColors.income,
           behavior: SnackBarBehavior.floating,
           shape:
@@ -167,11 +203,22 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
         ),
       );
       Navigator.pop(context, true);
+    } on ApiException catch (err) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(err.message),
+          backgroundColor: AppColors.expense,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Could not save transaction'),
+          content: const Text('Could not connect to the API'),
           backgroundColor: AppColors.expense,
           behavior: SnackBarBehavior.floating,
           shape:
@@ -211,7 +258,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                     ),
                   ),
                   Text(
-                    'Add Transaction',
+                    widget.initialTransaction == null
+                        ? 'Add Transaction'
+                        : 'Edit Transaction',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(width: 40),
@@ -263,13 +312,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                             color: isDark ? AppColors.darkCard : Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: AppColors.primary.withOpacity(0.3),
+                              color: AppColors.primary.withValues(alpha: 0.3),
                               width: 1.5,
                             ),
                           ),
                           child: Row(
                             children: [
-                              Text(
+                              const Text(
                                 '\$',
                                 style: TextStyle(
                                   color: AppColors.primary,
@@ -351,12 +400,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                                   decoration: BoxDecoration(
                                     color: isSelected
                                         ? cat.color
-                                        : cat.color.withOpacity(0.1),
+                                        : cat.color.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(18),
                                     border: Border.all(
                                       color: isSelected
                                           ? cat.color
-                                          : cat.color.withOpacity(0.3),
+                                          : cat.color.withValues(alpha: 0.3),
                                       width: 1.5,
                                     ),
                                   ),
@@ -527,7 +576,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                                               TransactionType.expense
                                           ? AppColors.expense
                                           : AppColors.income)
-                                      .withOpacity(0.35),
+                                      .withValues(alpha: 0.35),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 ),
@@ -543,9 +592,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen>
                                         color: Colors.white,
                                       ),
                                     )
-                                  : const Text(
-                                      'Save Transaction',
-                                      style: TextStyle(
+                                  : Text(
+                                      widget.initialTransaction == null
+                                          ? 'Save Transaction'
+                                          : 'Update Transaction',
+                                      style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 17,
                                         fontWeight: FontWeight.w700,

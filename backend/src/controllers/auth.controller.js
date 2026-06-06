@@ -3,7 +3,15 @@ const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 
 function signToken(userId) {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    const err = new Error('JWT secret is not configured');
+    err.status = 500;
+    throw err;
+  }
+
+  return jwt.sign({ userId }, secret, {
     expiresIn: process.env.JWT_EXPIRES_IN || '7d',
   });
 }
@@ -21,9 +29,11 @@ function toAuthResponse(user) {
 
 async function register(req, res, next) {
   try {
-    const { name, email, password } = req.body;
+    const name = typeof req.body.name === 'string' ? req.body.name.trim() : '';
+    const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    const { password } = req.body;
 
-    if (!name || !email || !password) {
+    if (!name || !email || typeof password !== 'string' || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
@@ -46,9 +56,10 @@ async function register(req, res, next) {
 
 async function login(req, res, next) {
   try {
-    const { email, password } = req.body;
+    const email = typeof req.body.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    const { password } = req.body;
 
-    if (!email || !password) {
+    if (!email || typeof password !== 'string' || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 

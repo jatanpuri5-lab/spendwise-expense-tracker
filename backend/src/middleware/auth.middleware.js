@@ -10,6 +10,10 @@ async function authenticate(req, res, next) {
       return res.status(401).json({ message: 'Authorization token is required' });
     }
 
+    if (!process.env.JWT_SECRET) {
+      return res.status(500).json({ message: 'JWT secret is not configured' });
+    }
+
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const [users] = await pool.query('SELECT id, name, email FROM users WHERE id = ?', [
       payload.userId,

@@ -16,8 +16,8 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController(text: 'demo@example.com');
-  final _passwordController = TextEditingController(text: 'password123');
+  final _emailController = TextEditingController(text: 'test@example.com');
+  final _passwordController = TextEditingController(text: '123456');
   bool _isLogin = true;
   bool _isLoading = false;
 
@@ -30,6 +30,8 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   Future<void> _submit() async {
+    if (_isLoading) return;
+
     final name = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
@@ -57,9 +59,14 @@ class _AuthScreenState extends State<AuthScreen> {
         MaterialPageRoute(builder: (_) => const MainNavigation()),
       );
     } on ApiException catch (err) {
+      if (!mounted) return;
       _showMessage(err.message, isError: true);
     } catch (_) {
-      _showMessage('Could not connect to the API', isError: true);
+      if (!mounted) return;
+      _showMessage(
+        'Cannot connect to server. Make sure backend is running.',
+        isError: true,
+      );
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -104,7 +111,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       borderRadius: BorderRadius.circular(26),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.35),
+                          color: AppColors.primary.withValues(alpha: 0.35),
                           blurRadius: 28,
                           offset: const Offset(0, 12),
                         ),

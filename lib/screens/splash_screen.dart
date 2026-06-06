@@ -51,8 +51,8 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 600),
     );
-    _textOpacity = Tween<double>(begin: 0.0, end: 1.0)
-        .animate(CurvedAnimation(parent: _textController, curve: Curves.easeIn));
+    _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+        CurvedAnimation(parent: _textController, curve: Curves.easeIn));
     _textSlide = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
@@ -120,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
                         borderRadius: BorderRadius.circular(32),
                         boxShadow: [
                           BoxShadow(
-                            color: AppColors.primary.withOpacity(0.4),
+                            color: AppColors.primary.withValues(alpha: 0.4),
                             blurRadius: 30,
                             offset: const Offset(0, 10),
                           ),
@@ -158,7 +158,7 @@ class _SplashScreenState extends State<SplashScreen>
                     Text(
                       'Smart Money, Smarter Life',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.5),
+                        color: Colors.white.withValues(alpha: 0.5),
                         fontSize: 14,
                         fontWeight: FontWeight.w400,
                         letterSpacing: 0.5,

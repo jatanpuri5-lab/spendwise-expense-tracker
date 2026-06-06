@@ -12,6 +12,26 @@ function mapBudget(row) {
   };
 }
 
+function validateBudget(body) {
+  const category = typeof body.category === 'string' ? body.category.trim() : '';
+  const limitAmount = Number(body.limitAmount);
+  const month = typeof body.month === 'string' ? body.month.trim() : '';
+
+  if (!category || body.limitAmount == null || !month) {
+    return { error: 'Category, limitAmount, and month are required' };
+  }
+
+  if (!Number.isFinite(limitAmount) || limitAmount <= 0) {
+    return { error: 'limitAmount must be a positive number' };
+  }
+
+  if (!/^\d{4}-\d{2}$/.test(month)) {
+    return { error: 'month must be in YYYY-MM format' };
+  }
+
+  return { value: { category, limitAmount, month } };
+}
+
 async function getBudgets(req, res, next) {
   try {
     const [rows] = await pool.query(
@@ -26,7 +46,7 @@ async function getBudgets(req, res, next) {
        FROM budgets b
        LEFT JOIN transactions t
          ON t.user_id = b.user_id
-        AND t.category = b.category
+        AND LOWER(t.category) = LOWER(b.category)
         AND t.type = 'expense'
         AND DATE_FORMAT(t.transaction_date, '%Y-%m') = b.month
        WHERE b.user_id = ?
@@ -43,11 +63,13 @@ async function getBudgets(req, res, next) {
 
 async function createBudget(req, res, next) {
   try {
-    const { category, limitAmount, month } = req.body;
+    const validation = validateBudget(req.body);
 
-    if (!category || limitAmount == null || !month) {
-      return res.status(400).json({ message: 'Category, limitAmount, and month are required' });
+    if (validation.error) {
+      return res.status(400).json({ message: validation.error });
     }
+
+    const { category, limitAmount, month } = validation.value;
 
     const [result] = await pool.query(
       'INSERT INTO budgets (user_id, category, limit_amount, month) VALUES (?, ?, ?, ?)',
@@ -69,7 +91,13 @@ async function createBudget(req, res, next) {
 
 async function updateBudget(req, res, next) {
   try {
-    const { category, limitAmount, month } = req.body;
+    const validation = validateBudget(req.body);
+
+    if (validation.error) {
+      return res.status(400).json({ message: validation.error });
+    }
+
+    const { category, limitAmount, month } = validation.value;
 
     const [result] = await pool.query(
       `UPDATE budgets

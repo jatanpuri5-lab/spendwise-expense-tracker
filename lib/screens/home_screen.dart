@@ -314,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             Text(
                               'Total Balance',
                               style: TextStyle(
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                               ),
@@ -323,7 +323,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
+                                color: Colors.white.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Row(
@@ -334,7 +334,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   Text(
                                     'Show',
                                     style: TextStyle(
-                                      color: Colors.white.withOpacity(0.8),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.8),
                                       fontSize: 12,
                                     ),
                                   ),
@@ -369,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             Container(
                               width: 1,
                               height: 40,
-                              color: Colors.white.withOpacity(0.2),
+                              color: Colors.white.withValues(alpha: 0.2),
                             ),
                             Expanded(
                               child: _buildBalanceItem(
@@ -460,7 +461,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(title: 'Income vs Expense'),
+                  const SectionHeader(title: 'Income vs Expense'),
                   const SizedBox(height: 16),
                   _buildBarChart(isDark),
                 ],
@@ -475,7 +476,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(title: 'By Category'),
+                  const SectionHeader(title: 'By Category'),
                   const SizedBox(height: 16),
                   _buildPieChart(isDark),
                 ],
@@ -490,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(title: 'Quick Actions'),
+                  const SectionHeader(title: 'Quick Actions'),
                   const SizedBox(height: 16),
                   _buildQuickActions(isDark),
                 ],
@@ -556,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: color.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),
@@ -568,7 +569,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               Text(
                 label,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                   fontSize: 12,
                 ),
               ),
@@ -601,7 +602,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         color: isDark ? AppColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: color.withOpacity(0.2),
+          color: color.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -611,7 +612,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -668,8 +669,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               horizontalInterval: maxVal / 4,
               getDrawingHorizontalLine: (v) => FlLine(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.grey.withOpacity(0.1),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.grey.withValues(alpha: 0.1),
                 strokeWidth: 1,
               ),
               drawVerticalLine: false,
@@ -748,8 +749,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      AppColors.primary.withOpacity(0.25),
-                      AppColors.primary.withOpacity(0.0),
+                      AppColors.primary.withValues(alpha: 0.25),
+                      AppColors.primary.withValues(alpha: 0.0),
                     ],
                   ),
                 ),
@@ -858,8 +859,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             horizontalInterval: maxValue == 0 ? 1 : maxValue / 4,
             getDrawingHorizontalLine: (v) => FlLine(
               color: isDark
-                  ? Colors.white.withOpacity(0.05)
-                  : Colors.grey.withOpacity(0.1),
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.grey.withValues(alpha: 0.1),
               strokeWidth: 1,
             ),
             drawVerticalLine: false,
@@ -871,13 +872,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               barRods: [
                 BarChartRodData(
                   toY: incData[i],
-                  color: AppColors.income.withOpacity(0.7),
+                  color: AppColors.income.withValues(alpha: 0.7),
                   width: 8,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 BarChartRodData(
                   toY: expData[i],
-                  color: AppColors.expense.withOpacity(0.7),
+                  color: AppColors.expense.withValues(alpha: 0.7),
                   width: 8,
                   borderRadius: BorderRadius.circular(4),
                 ),
@@ -1015,7 +1016,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               width: 58,
               height: 58,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.12),
+                color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Icon(a['icon'] as IconData, color: color, size: 26),

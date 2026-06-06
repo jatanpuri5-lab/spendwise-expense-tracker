@@ -47,7 +47,7 @@ class _MainNavigationState extends State<MainNavigation> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final screens = [
       HomeScreen(refreshVersion: _refreshVersion),
-      const AnalyticsScreen(),
+      AnalyticsScreen(refreshVersion: _refreshVersion),
       TransactionsScreen(refreshVersion: _refreshVersion),
       const ProfileScreen(),
     ];
@@ -64,7 +64,7 @@ class _MainNavigationState extends State<MainNavigation> {
           color: isDark ? AppColors.darkSurface : Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, -5),
             ),
@@ -103,7 +103,7 @@ class _MainNavigationState extends State<MainNavigation> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.4),
+                color: AppColors.primary.withValues(alpha: 0.4),
                 blurRadius: 16,
                 offset: const Offset(0, 6),
               ),
@@ -128,7 +128,7 @@ class _MainNavigationState extends State<MainNavigation> {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.1)
+              ? AppColors.primary.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),

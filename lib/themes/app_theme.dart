@@ -62,11 +62,9 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.darkSurface,
-        background: AppColors.darkBg,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: AppColors.darkTextPrimary,
-        onBackground: AppColors.darkTextPrimary,
       ),
       textTheme: GoogleFonts.dmSansTextTheme(
         const TextTheme(
@@ -178,11 +176,9 @@ class AppTheme {
         primary: AppColors.primary,
         secondary: AppColors.accent,
         surface: AppColors.lightSurface,
-        background: AppColors.lightBg,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
         onSurface: AppColors.lightTextPrimary,
-        onBackground: AppColors.lightTextPrimary,
       ),
       textTheme: GoogleFonts.dmSansTextTheme(
         const TextTheme(
@@ -241,7 +237,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        shadowColor: AppColors.primary.withOpacity(0.08),
+        shadowColor: AppColors.primary.withValues(alpha: 0.08),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,

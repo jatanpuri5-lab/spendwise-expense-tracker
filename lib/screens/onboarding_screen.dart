@@ -145,7 +145,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       decoration: BoxDecoration(
                         color: i == _currentPage
                             ? _pages[_currentPage].gradient.first
-                            : Colors.white.withOpacity(0.2),
+                            : Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -172,7 +172,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           color: _pages[_currentPage]
                               .gradient
                               .first
-                              .withOpacity(0.4),
+                              .withValues(alpha: 0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 8),
                         ),
@@ -200,7 +200,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     child: Text(
                       'Skip',
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.4),
+                        color: Colors.white.withValues(alpha: 0.4),
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -234,8 +234,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      page.gradient.first.withOpacity(0.15),
-                      page.gradient.last.withOpacity(0.05),
+                      page.gradient.first.withValues(alpha: 0.15),
+                      page.gradient.last.withValues(alpha: 0.05),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
@@ -255,7 +255,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: page.gradient.first.withOpacity(0.4),
+                          color: page.gradient.first.withValues(alpha: 0.4),
                           blurRadius: 40,
                           offset: const Offset(0, 15),
                         ),
@@ -291,7 +291,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                     page.subtitle,
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 16,
                       height: 1.6,
                     ),

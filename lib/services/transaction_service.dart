@@ -9,8 +9,9 @@ class TransactionService {
   final ApiService _api;
 
   Future<List<TransactionModel>> getTransactions() async {
-    final json = await _api.get('/transactions') as List<dynamic>;
-    return json
+    final json = await _api.get('/transactions');
+    final items = _listFromJson(json);
+    return items
         .map((item) => _transactionFromJson(item as Map<String, dynamic>))
         .toList();
   }
@@ -27,7 +28,7 @@ class TransactionService {
       'title': title,
       'amount': amount,
       'type': type.name,
-      'category': category.name,
+      'category': category.label,
       'transactionDate': _dateOnly(date),
       'note': notes,
     }) as Map<String, dynamic>;
@@ -41,7 +42,7 @@ class TransactionService {
       'title': transaction.title,
       'amount': transaction.amount,
       'type': transaction.type.name,
-      'category': transaction.category.name,
+      'category': transaction.category.label,
       'transactionDate': _dateOnly(transaction.date),
       'note': transaction.notes,
     }) as Map<String, dynamic>;
@@ -76,11 +77,28 @@ class TransactionService {
   }
 
   TransactionCategory _categoryFromString(String value) {
-    final normalized = value.trim().toLowerCase();
+    final normalized = value.trim().toLowerCase().replaceAll(' ', '');
     return TransactionCategory.values.firstWhere(
-      (category) => category.name == normalized,
+      (category) =>
+          category.name == normalized ||
+          category.label.toLowerCase().replaceAll(' ', '') == normalized,
       orElse: () => TransactionCategory.other,
     );
+  }
+
+  List<dynamic> _listFromJson(dynamic json) {
+    if (json is List<dynamic>) {
+      return json;
+    }
+
+    if (json is Map<String, dynamic>) {
+      final transactions = json['transactions'] ?? json['data'];
+      if (transactions is List<dynamic>) {
+        return transactions;
+      }
+    }
+
+    return const [];
   }
 
   int? _intFromJson(dynamic value) {

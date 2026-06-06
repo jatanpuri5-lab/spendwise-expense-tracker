@@ -3,9 +3,11 @@
 import 'package:flutter/material.dart';
 import '../themes/app_theme.dart';
 import '../models/transaction_model.dart';
+import '../services/api_service.dart';
 import '../services/app_services.dart';
 import '../widgets/transaction_card.dart';
 import '../utils/formatters.dart';
+import 'add_expense_screen.dart';
 
 enum SortOrder { latest, oldest, highest, lowest }
 
@@ -107,6 +109,52 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
     }
   }
 
+  Future<void> _deleteTransaction(TransactionModel transaction) async {
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete transaction?'),
+        content: Text('Remove "${transaction.title}" permanently?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+
+    try {
+      await AppServices.transactions.deleteTransaction(transaction.id);
+      await _loadTransactions();
+      if (!mounted) return;
+      _showMessage('Transaction deleted', isError: false);
+    } on ApiException catch (err) {
+      if (!mounted) return;
+      _showMessage(err.message, isError: true);
+    } catch (_) {
+      if (!mounted) return;
+      _showMessage('Could not delete transaction', isError: true);
+    }
+  }
+
+  void _showMessage(String message, {required bool isError}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? AppColors.expense : AppColors.income,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   void _showSortSheet() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
@@ -125,16 +173,24 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               Text('Sort By',
                   style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: 16),
-              ...SortOrder.values.map(
-                (s) => RadioListTile<SortOrder>(
-                  title: Text(_sortLabel(s)),
-                  value: s,
-                  groupValue: _sortOrder,
-                  activeColor: AppColors.primary,
-                  onChanged: (v) {
-                    setState(() => _sortOrder = v!);
-                    Navigator.pop(ctx);
-                  },
+              RadioGroup<SortOrder>(
+                groupValue: _sortOrder,
+                onChanged: (v) {
+                  if (v == null) return;
+                  setState(() => _sortOrder = v);
+                  Navigator.pop(ctx);
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: SortOrder.values
+                      .map(
+                        (s) => RadioListTile<SortOrder>(
+                          title: Text(_sortLabel(s)),
+                          value: s,
+                          activeColor: AppColors.primary,
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
               const SizedBox(height: 16),
@@ -416,7 +472,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: t.category.color.withOpacity(0.15),
+                color: t.category.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(t.category.icon, color: t.category.color, size: 24),
@@ -439,6 +495,43 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
               _detailRow('Payment', t.paymentMethod!),
             if (t.notes != null) _detailRow('Notes', t.notes!),
             const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      final updated = await Navigator.of(context).push<bool>(
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AddExpenseScreen(initialTransaction: t),
+                        ),
+                      );
+                      if (updated == true) {
+                        _loadTransactions();
+                      }
+                    },
+                    icon: const Icon(Icons.edit_rounded),
+                    label: const Text('Edit'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _deleteTransaction(t);
+                    },
+                    icon: const Icon(Icons.delete_rounded),
+                    label: const Text('Delete'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.expense,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
           ],
         ),
       ),

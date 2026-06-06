@@ -11,7 +11,9 @@ import '../widgets/filter_chip_row.dart';
 import '../utils/formatters.dart';
 
 class AnalyticsScreen extends StatefulWidget {
-  const AnalyticsScreen({super.key});
+  final int refreshVersion;
+
+  const AnalyticsScreen({super.key, this.refreshVersion = 0});
 
   @override
   State<AnalyticsScreen> createState() => _AnalyticsScreenState();
@@ -21,9 +23,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
     with SingleTickerProviderStateMixin {
   int _filterIndex = 1; // weekly/monthly toggle
   int _touchedPieIndex = -1;
-  String? _selectedCategory;
   late AnimationController _animController;
-  late Animation<double> _fadeAnim;
   Map<TransactionCategory, double> _apiCategoryTotals = {};
 
   final List<String> _filters = ['Weekly', 'Monthly', 'Quarterly', 'Yearly'];
@@ -35,7 +35,6 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _fadeAnim = CurvedAnimation(parent: _animController, curve: Curves.easeIn);
     _animController.forward();
     _loadCategoryTotals();
   }
@@ -54,6 +53,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
     } catch (_) {
       if (!mounted) return;
       setState(() => _apiCategoryTotals = {});
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant AnalyticsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.refreshVersion != widget.refreshVersion) {
+      _loadCategoryTotals();
     }
   }
 
@@ -180,7 +187,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(title: 'Spending Breakdown'),
+                  const SectionHeader(title: 'Spending Breakdown'),
                   const SizedBox(height: 16),
                   _buildLargePieChart(isDark, sortedEntries, totalExpense),
                 ],
@@ -195,7 +202,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(title: 'Expense Breakdown'),
+                  const SectionHeader(title: 'Expense Breakdown'),
                   const SizedBox(height: 16),
                   _buildAnimatedBarChart(isDark),
                 ],
@@ -210,7 +217,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(title: 'Income vs Expense Trend'),
+                  const SectionHeader(title: 'Income vs Expense Trend'),
                   const SizedBox(height: 16),
                   _buildTrendChart(isDark),
                 ],
@@ -225,7 +232,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionHeader(title: 'Category Comparison'),
+                  const SectionHeader(title: 'Category Comparison'),
                   const SizedBox(height: 16),
                   ...sortedEntries.map(
                     (e) => _buildCategoryBar(
@@ -260,7 +267,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCard : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,8 +460,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
               drawVerticalLine: false,
               getDrawingHorizontalLine: (v) => FlLine(
                 color: isDark
-                    ? Colors.white.withOpacity(0.05)
-                    : Colors.grey.withOpacity(0.1),
+                    ? Colors.white.withValues(alpha: 0.05)
+                    : Colors.grey.withValues(alpha: 0.1),
                 strokeWidth: 1,
               ),
             ),
@@ -484,8 +491,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
   }
 
   Widget _buildTrendChart(bool isDark) {
-    final expData = DummyData.monthlyExpenses;
-    final incData = DummyData.monthlyIncome;
+    const expData = DummyData.monthlyExpenses;
+    const incData = DummyData.monthlyIncome;
 
     return Container(
       height: 200,
@@ -501,8 +508,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
             drawVerticalLine: false,
             getDrawingHorizontalLine: (v) => FlLine(
               color: isDark
-                  ? Colors.white.withOpacity(0.05)
-                  : Colors.grey.withOpacity(0.1),
+                  ? Colors.white.withValues(alpha: 0.05)
+                  : Colors.grey.withValues(alpha: 0.1),
               strokeWidth: 1,
             ),
           ),
@@ -567,7 +574,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
-                color: AppColors.income.withOpacity(0.08),
+                color: AppColors.income.withValues(alpha: 0.08),
               ),
             ),
             // Expense line
@@ -584,7 +591,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
-                color: AppColors.expense.withOpacity(0.08),
+                color: AppColors.expense.withValues(alpha: 0.08),
               ),
             ),
           ],
@@ -635,7 +642,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: category.color.withOpacity(0.15),
+              color: category.color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(category.icon, color: category.color, size: 20),
@@ -668,7 +675,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen>
                     Container(
                       height: 6,
                       decoration: BoxDecoration(
-                        color: category.color.withOpacity(0.1),
+                        color: category.color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(3),
                       ),
                     ),

@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 68,
                       height: 68,
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Center(
@@ -113,7 +113,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           user?.email ?? 'Signed in',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: Colors.white.withValues(alpha: 0.7),
                             fontSize: 13,
                           ),
                         ),
@@ -122,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: const Text(
@@ -186,7 +186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     trailing: Switch(
                       value: _isDarkMode,
                       onChanged: (v) => setState(() => _isDarkMode = v),
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ),
                   _buildSettingsTile(
@@ -199,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       value: _notificationsEnabled,
                       onChanged: (v) =>
                           setState(() => _notificationsEnabled = v),
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ),
                   _buildSettingsTile(
@@ -211,7 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     trailing: Switch(
                       value: _biometricEnabled,
                       onChanged: (v) => setState(() => _biometricEnabled = v),
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                     ),
                   ),
                 ],
@@ -315,10 +315,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Container(
                   height: 54,
                   decoration: BoxDecoration(
-                    color: AppColors.expense.withOpacity(0.1),
+                    color: AppColors.expense.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16),
-                    border:
-                        Border.all(color: AppColors.expense.withOpacity(0.3)),
+                    border: Border.all(
+                        color: AppColors.expense.withValues(alpha: 0.3)),
                   ),
                   child: const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -358,7 +358,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: BoxDecoration(
           color: isDark ? AppColors.darkCard : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withOpacity(0.2)),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -409,7 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.12),
+                color: iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: iconColor, size: 20),

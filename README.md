@@ -87,16 +87,85 @@ flutter pub get
 flutter run -d chrome
 ```
 
+To run on the connected Pixel 6, use the real device ID shown by `flutter devices`:
+
+```powershell
+cd D:\expense_tracker
+flutter devices
+flutter run -d 1B261FDF60068X --dart-define=API_BASE_URL=http://YOUR_LAPTOP_IP:5000/api
+```
+
+Do not use `flutter run -d android`; Flutter expects a real device ID or name.
+
+API base URL:
+
+- Real Pixel 6: `http://YOUR_LAPTOP_IP:5000/api`
+- Chrome: `http://localhost:5000/api`
+
+If Android build fails because the broken NDK folder `28.2.13676358` is missing `source.properties`, delete the broken local copy and install the stable NDK version used by the project.
+
+Delete broken NDK folder:
+
+```powershell
+Remove-Item -Recurse -Force "C:\Users\dell\AppData\Local\Android\Sdk\ndk\28.2.13676358" -ErrorAction SilentlyContinue
+```
+
+Install stable NDK 27 in Android Studio:
+
+```text
+Android Studio > Settings > Languages & Frameworks > Android SDK > SDK Tools
+Enable "Show Package Details"
+Expand "NDK (Side by side)"
+Install "27.0.12077973"
+```
+
+Then run:
+
+```powershell
+cd D:\expense_tracker
+flutter clean
+flutter pub get
+flutter doctor
+flutter run -d 1B261FDF60068X --dart-define=API_BASE_URL=http://YOUR_LAPTOP_IP:5000/api
+```
+
 ### Backend Setup
 
 ```bash
 cd D:\expense_tracker\backend
 npm install
 copy .env.example .env
-npm run dev
+npm.cmd run dev
 ```
 
 After copying `.env.example`, update `.env` with your local MySQL credentials and JWT secret.
+
+If port `5000` is already in use, stop the existing backend process or change `PORT` in `backend/.env`.
+
+Check which process uses port 5000:
+
+```powershell
+netstat -ano | findstr :5000
+```
+
+Kill process by PID:
+
+```powershell
+taskkill /PID YOUR_PID /F
+```
+
+Alternative if Node is stuck:
+
+```powershell
+taskkill /F /IM node.exe
+```
+
+Start backend:
+
+```powershell
+cd D:\expense_tracker\backend
+npm.cmd run dev
+```
 
 ## Environment Variables
 

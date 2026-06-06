@@ -1,3 +1,4 @@
+
 // lib/main.dart
 
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class SpendWiseApp extends StatefulWidget {
   State<SpendWiseApp> createState() => _SpendWiseAppState();
 
   // Allow child widgets to toggle theme via context
-  static _SpendWiseAppState of(BuildContext context) =>
+  static State<SpendWiseApp> of(BuildContext context) =>
       context.findAncestorStateOfType<_SpendWiseAppState>()!;
 }
 

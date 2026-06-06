@@ -197,38 +197,114 @@ class DummyData {
   ];
 
   // ─── Budgets ────────────────────────────────────────────────────
-  static final List<BudgetModel> budgets = [
-    BudgetModel(id: 'b1', category: TransactionCategory.food, limit: 400.0, spent: 265.80),
-    BudgetModel(id: 'b2', category: TransactionCategory.shopping, limit: 300.0, spent: 324.49),
-    BudgetModel(id: 'b3', category: TransactionCategory.transport, limit: 150.0, spent: 118.40),
-    BudgetModel(id: 'b4', category: TransactionCategory.bills, limit: 250.0, spent: 215.00),
-    BudgetModel(id: 'b5', category: TransactionCategory.health, limit: 200.0, spent: 190.20),
-    BudgetModel(id: 'b6', category: TransactionCategory.entertainment, limit: 100.0, spent: 57.98),
+  static const List<BudgetModel> budgets = [
+    BudgetModel(
+        id: 'b1',
+        category: TransactionCategory.food,
+        limit: 400.0,
+        spent: 265.80),
+    BudgetModel(
+        id: 'b2',
+        category: TransactionCategory.shopping,
+        limit: 300.0,
+        spent: 324.49),
+    BudgetModel(
+        id: 'b3',
+        category: TransactionCategory.transport,
+        limit: 150.0,
+        spent: 118.40),
+    BudgetModel(
+        id: 'b4',
+        category: TransactionCategory.bills,
+        limit: 250.0,
+        spent: 215.00),
+    BudgetModel(
+        id: 'b5',
+        category: TransactionCategory.health,
+        limit: 200.0,
+        spent: 190.20),
+    BudgetModel(
+        id: 'b6',
+        category: TransactionCategory.entertainment,
+        limit: 100.0,
+        spent: 57.98),
   ];
 
   // ─── Weekly Chart Data ───────────────────────────────────────────
   static const List<double> weeklyExpenses = [
-    120.0, 85.0, 210.0, 95.0, 180.0, 240.0, 65.0
+    120.0,
+    85.0,
+    210.0,
+    95.0,
+    180.0,
+    240.0,
+    65.0
   ];
 
   static const List<double> weeklyIncome = [
-    0.0, 0.0, 800.0, 0.0, 0.0, 5200.0, 0.0
+    0.0,
+    0.0,
+    800.0,
+    0.0,
+    0.0,
+    5200.0,
+    0.0
   ];
 
-  static const List<String> weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  static const List<String> weekDays = [
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun'
+  ];
 
   // ─── Monthly Chart Data ──────────────────────────────────────────
   static const List<double> monthlyExpenses = [
-    2100, 1850, 2400, 2200, 1950, 2800, 2100, 1750, 2300, 2600, 2450, 1971
+    2100,
+    1850,
+    2400,
+    2200,
+    1950,
+    2800,
+    2100,
+    1750,
+    2300,
+    2600,
+    2450,
+    1971
   ];
 
   static const List<double> monthlyIncome = [
-    5200, 5200, 6000, 5200, 5450, 5200, 5700, 5200, 5200, 5900, 5200, 6250
+    5200,
+    5200,
+    6000,
+    5200,
+    5450,
+    5200,
+    5700,
+    5200,
+    5200,
+    5900,
+    5200,
+    6250
   ];
 
   static const List<String> months = [
-    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec'
   ];
 
   // ─── Summary ─────────────────────────────────────────────────────
@@ -240,7 +316,8 @@ class DummyData {
   // ─── Category Spending (for pie chart) ───────────────────────────
   static Map<TransactionCategory, double> get categoryTotals {
     final Map<TransactionCategory, double> totals = {};
-    for (final t in transactions.where((t) => t.type == TransactionType.expense)) {
+    for (final t
+        in transactions.where((t) => t.type == TransactionType.expense)) {
       totals[t.category] = (totals[t.category] ?? 0) + t.amount;
     }
     return totals;

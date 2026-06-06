@@ -56,10 +56,22 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    final json = await _api.post('/auth/login', {
-      'email': email,
-      'password': password,
-    }) as Map<String, dynamic>;
+    late final Map<String, dynamic> json;
+
+    try {
+      json = await _api.post('/auth/login', {
+        'email': email,
+        'password': password,
+      }) as Map<String, dynamic>;
+    } on ApiException catch (err) {
+      if (err.statusCode == 400 ||
+          err.statusCode == 401 ||
+          err.statusCode == 403) {
+        throw const ApiException('Invalid email or password');
+      }
+
+      rethrow;
+    }
 
     return _setSession(json);
   }

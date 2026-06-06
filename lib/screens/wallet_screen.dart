@@ -18,8 +18,7 @@ class WalletScreen extends StatelessWidget {
     final savingsData = <FlSpot>[];
     double runningTotal = 8000;
     for (int i = 0; i < 12; i++) {
-      runningTotal +=
-          DummyData.monthlyIncome[i] - DummyData.monthlyExpenses[i];
+      runningTotal += DummyData.monthlyIncome[i] - DummyData.monthlyExpenses[i];
       savingsData.add(FlSpot(i.toDouble(), runningTotal));
     }
 
@@ -50,7 +49,7 @@ class WalletScreen extends StatelessWidget {
                       Text(
                         'Primary Wallet',
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.7),
+                          color: Colors.white.withValues(alpha: 0.7),
                           fontSize: 13,
                         ),
                       ),
@@ -120,8 +119,7 @@ class WalletScreen extends StatelessWidget {
                     color: AppColors.income),
                 _summaryCard(context, isDark,
                     label: 'Avg. Expense',
-                    value: Formatters.currency(
-                        DummyData.totalExpenses / 30),
+                    value: Formatters.currency(DummyData.totalExpenses / 30),
                     change: '-3.2%',
                     positive: true,
                     icon: Icons.trending_down_rounded,
@@ -156,8 +154,8 @@ class WalletScreen extends StatelessWidget {
                     drawVerticalLine: false,
                     getDrawingHorizontalLine: (v) => FlLine(
                       color: isDark
-                          ? Colors.white.withOpacity(0.05)
-                          : Colors.grey.withOpacity(0.1),
+                          ? Colors.white.withValues(alpha: 0.05)
+                          : Colors.grey.withValues(alpha: 0.1),
                       strokeWidth: 1,
                     ),
                   ),
@@ -223,8 +221,8 @@ class WalletScreen extends StatelessWidget {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: [
-                            AppColors.income.withOpacity(0.2),
-                            AppColors.income.withOpacity(0.0),
+                            AppColors.income.withValues(alpha: 0.2),
+                            AppColors.income.withValues(alpha: 0.0),
                           ],
                         ),
                       ),
@@ -243,14 +241,12 @@ class WalletScreen extends StatelessWidget {
                 icon: Icons.trending_down_rounded,
                 color: AppColors.income,
                 title: 'Great job!',
-                subtitle:
-                    'Your food expenses are 12% lower than last month.'),
+                subtitle: 'Your food expenses are 12% lower than last month.'),
             _buildInsightCard(context, isDark,
                 icon: Icons.warning_rounded,
                 color: AppColors.expense,
                 title: 'Over budget',
-                subtitle:
-                    'Shopping exceeded budget by \$24.49 this month.'),
+                subtitle: 'Shopping exceeded budget by \$24.49 this month.'),
             _buildInsightCard(context, isDark,
                 icon: Icons.lightbulb_rounded,
                 color: const Color(0xFFFF922B),
@@ -271,7 +267,7 @@ class WalletScreen extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.6),
+            color: Colors.white.withValues(alpha: 0.6),
             fontSize: 11,
           ),
         ),
@@ -303,7 +299,7 @@ class WalletScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: color.withOpacity(0.15)),
+        border: Border.all(color: color.withValues(alpha: 0.15)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,12 +309,11 @@ class WalletScreen extends StatelessWidget {
             children: [
               Icon(icon, color: color, size: 20),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: positive
-                      ? AppColors.income.withOpacity(0.1)
-                      : AppColors.expense.withOpacity(0.1),
+                      ? AppColors.income.withValues(alpha: 0.1)
+                      : AppColors.expense.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -367,7 +362,7 @@ class WalletScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.2)),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -375,7 +370,7 @@ class WalletScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 20),
@@ -385,8 +380,7 @@ class WalletScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title,
-                    style: Theme.of(context).textTheme.titleMedium),
+                Text(title, style: Theme.of(context).textTheme.titleMedium),
                 const SizedBox(height: 2),
                 Text(subtitle,
                     style: Theme.of(context)

@@ -1,5 +1,6 @@
 // lib/services/api_service.dart
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -19,6 +20,7 @@ class ApiService {
   ApiService({http.Client? client}) : _client = client ?? http.Client();
 
   static const String _lanApiUrl = String.fromEnvironment('API_BASE_URL');
+  static const Duration requestTimeout = Duration(seconds: 10);
 
   static String get defaultBaseUrl {
     if (_lanApiUrl.isNotEmpty) {
@@ -48,36 +50,59 @@ class ApiService {
   }
 
   Future<dynamic> get(String path) async {
-    final response = await _client.get(_uri(path), headers: _headers);
-    return _handleResponse(response);
+    return _send(() => _client.get(_uri(path), headers: _headers));
   }
 
   Future<dynamic> post(String path, Map<String, dynamic> body) async {
-    final response = await _client.post(
-      _uri(path),
-      headers: _headers,
-      body: jsonEncode(body),
+    return _send(
+      () => _client.post(
+        _uri(path),
+        headers: _headers,
+        body: jsonEncode(body),
+      ),
     );
-    return _handleResponse(response);
   }
 
   Future<dynamic> put(String path, Map<String, dynamic> body) async {
-    final response = await _client.put(
-      _uri(path),
-      headers: _headers,
-      body: jsonEncode(body),
+    return _send(
+      () => _client.put(
+        _uri(path),
+        headers: _headers,
+        body: jsonEncode(body),
+      ),
     );
-    return _handleResponse(response);
   }
 
   Future<void> delete(String path) async {
-    final response = await _client.delete(_uri(path), headers: _headers);
-    _handleResponse(response);
+    await _send(() => _client.delete(_uri(path), headers: _headers));
   }
 
   Uri _uri(String path) {
     final normalizedPath = path.startsWith('/') ? path : '/$path';
     return Uri.parse('$baseUrl$normalizedPath');
+  }
+
+  Future<dynamic> _send(Future<http.Response> Function() request) async {
+    try {
+      final response = await request().timeout(requestTimeout);
+      return _handleResponse(response);
+    } on TimeoutException {
+      throw const ApiException(
+        'Connection timeout. Please check backend and Wi-Fi.',
+      );
+    } on http.ClientException {
+      throw const ApiException(
+        'Cannot connect to server. Make sure backend is running.',
+      );
+    } catch (err) {
+      if (err is ApiException) {
+        rethrow;
+      }
+
+      throw const ApiException(
+        'Cannot connect to server. Make sure backend is running.',
+      );
+    }
   }
 
   dynamic _handleResponse(http.Response response) {

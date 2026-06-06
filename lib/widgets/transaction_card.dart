@@ -32,9 +32,7 @@ class TransactionCard extends StatelessWidget {
           color: isDark ? AppColors.darkCard : AppColors.lightCard,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isDark
-                ? AppColors.darkDivider
-                : Colors.grey.shade100,
+            color: isDark ? AppColors.darkDivider : Colors.grey.shade100,
             width: 1,
           ),
         ),
@@ -45,7 +43,7 @@ class TransactionCard extends StatelessWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: cat.color.withOpacity(0.15),
+                color: cat.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(cat.icon, color: cat.color, size: 24),
@@ -72,7 +70,7 @@ class TransactionCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: cat.color.withOpacity(0.1),
+                          color: cat.color.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
@@ -88,9 +86,10 @@ class TransactionCard extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           Formatters.date(transaction.date),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontSize: 12,
-                              ),
+                          style:
+                              Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontSize: 12,
+                                  ),
                         ),
                       ],
                     ],
